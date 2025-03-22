@@ -23,7 +23,7 @@ panic-probe = { version = "0.3.2", features = ["print-defmt"], optional = true }
 embassy-embedded-hal = { version = "0.3.0", features = ["defmt"] }
 
 micromath = "2.0.0"
-cs43l22-embedded = { version = "0.1.0", features = ["defmt"] }
+cs43l22-embedded = { version = "1.0.0-alpha", features = ["defmt"] }
 
 
 [[bin]]

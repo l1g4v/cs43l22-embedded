@@ -17,10 +17,10 @@ use embassy_stm32::{
     i2s::{Config, Format, I2S},
     time::Hertz,
 };
-use embassy_time::{Duration, Timer};
+use embassy_time::Delay;
+use micromath::F32Ext;
 
 use cs43l22_embedded::Cs43l22;
-use micromath::F32Ext;
 
 const SAMPLE_RATE: u32 = 48_000;
 const FRECUENCY: u32 = 375;
@@ -64,48 +64,36 @@ async fn main(_spawner: Spawner) {
     };
 
     let p = embassy_stm32::init(config);
-
+    //configure I2C1
     let mut i2c = I2c::new_blocking(p.I2C1, p.PB6, p.PB9, Hertz(100_000), Default::default());
-
     //configure PD4 as output for reset pin for the CS43L22
-    let mut reset = Output::new(p.PD4, Level::Low, Speed::High);
-    reset.set_low();
-    Timer::after(Duration::from_millis(100)).await;
-    reset.set_high();
-    Timer::after(Duration::from_millis(100)).await;
-
+    let reset = Output::new(p.PD4, Level::Low, Speed::High);
     let mut cs43l22 = Cs43l22::new(
         &mut i2c,
-        cs43l22_embedded::Config::default()
-            .output_device(cs43l22_embedded::OutputDevice::Auto)
-            .with_tone_control(true)
-            .treble_cutoff(cs43l22_embedded::TrebleCutoff::_5kHz)
-            .treble_gain(cs43l22_embedded::ToneGain::_12dB),
-        cs43l22_embedded::BeepConfig::default()
-            .mix(true)
-            .mode(cs43l22_embedded::BeepMode::Off)
-            .pitch(cs43l22_embedded::BeepPitch::F6),
+        reset,
+        Delay,
+        cs43l22_embedded::Config::default(),
+        cs43l22_embedded::BeepConfig::default(),
         false,
     )
     .unwrap();
-
-    cs43l22.set_volume_a(100).ok();
-    cs43l22.set_volume_b(100).ok();
 
     // stereo wavetable generation
     let mut wavetable = [0u16; (2 * SAMPLE_RATE / FRECUENCY) as usize];
     let sample_dt = FRECUENCY as f32 / SAMPLE_RATE as f32;
     for i in 0..(SAMPLE_RATE / FRECUENCY) as usize {
-        let sinval = (2.0 * PI * i as f32 * sample_dt).sin(); // + (2.0* PI * i as f32*harmonic_dt).sin();
-
+        let sinval = (2.0 * PI * i as f32 * sample_dt).sin();
         let val = (sinval * 16383.75) as u16;
-        //store half of the binary value in one channel and the other half in the other channel
+        
+        //store the same value in both channels (0 2 4... 1 3 5...)
         wavetable[i * 2] = val;
         wavetable[i * 2 + 1] = val;
     }
 
+    // Create a buffer to store the samples to be played
     let mut dma_buffer = [0u16; (2 * SAMPLE_RATE / FRECUENCY) as usize];
 
+    // Configure I2S
     let mut i2s_config = Config::default();
     i2s_config.format = Format::Data16Channel32;
     i2s_config.standard = embassy_stm32::i2s::Standard::Philips;
@@ -124,8 +112,10 @@ async fn main(_spawner: Spawner) {
     i2s.start();
 
     info!("Playing");
+    // Enable playback
     cs43l22.play().ok();
     loop {
+        // Write the wavetable to the I2S peripheral forever
         i2s.write(&wavetable).await.ok();
     }
 }
