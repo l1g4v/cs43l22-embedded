@@ -3,6 +3,10 @@ name = "cs43l22-embedded"
 version = "0.1.0"
 edition = "2021"
 
+exclude = [
+    "examples/stm32f4",
+]
+
 [dependencies]
 defmt = { version = "0.3", optional = true }
 num-traits = { version = "0.2", default-features = false }
@@ -11,5 +15,4 @@ embedded-hal-async = { version = "1" }
 document-features = "0.2.8"
 
 [features]
-
 defmt = ["dep:defmt"]

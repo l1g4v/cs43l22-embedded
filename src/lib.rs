@@ -16,16 +16,16 @@ const CS43L22_REG_POWER_CTL1: u8 = 0x02;
 const CS43L22_REG_POWER_CTL2: u8 = 0x04;
 const CS43L22_REG_CLOCKING_CTL: u8 = 0x05;
 const CS43L22_REG_INTERFACE_CTL1: u8 = 0x06;
-const CS43L22_REG_INTERFACE_CTL2: u8 = 0x07;
+/*const CS43L22_REG_INTERFACE_CTL2: u8 = 0x07;
 const CS43L22_REG_PASSTHROUGH_A_SELECT: u8 = 0x08;
-const CS43L22_REG_PASSTHROUGH_B_SELECT: u8 = 0x09;
+const CS43L22_REG_PASSTHROUGH_B_SELECT: u8 = 0x09;*/
 const CS43L22_REG_ANALOG_ZC_SR_SETT: u8 = 0x0A;
-const CS43L22_REG_PASSTHROUGH_GANG_CTL: u8 = 0x0C;
-const CS43L22_REG_PLAYBACK_CTL1: u8 = 0x0D;
+/*const CS43L22_REG_PASSTHROUGH_GANG_CTL: u8 = 0x0C;
+const CS43L22_REG_PLAYBACK_CTL1: u8 = 0x0D;*/
 const CS43L22_REG_MISC_CTL: u8 = 0x0E;
-const CS43L22_REG_PLAYBACK_CTL2: u8 = 0x0F;
+/*const CS43L22_REG_PLAYBACK_CTL2: u8 = 0x0F;
 const CS43L22_REG_PASSTHROUGH_A_VOL: u8 = 0x14;
-const CS43L22_REG_PASSTHROUGH_B_VOL: u8 = 0x15;
+const CS43L22_REG_PASSTHROUGH_B_VOL: u8 = 0x15;*/
 const CS43L22_REG_PCMA_VOL: u8 = 0x1A;
 const CS43L22_REG_PCMB_VOL: u8 = 0x1B;
 const CS43L22_REG_BEEP_FREQ_ONTIME: u8 = 0x1C;
@@ -36,17 +36,17 @@ const CS43L22_REG_MASTER_A_VOL: u8 = 0x20;
 const CS43L22_REG_MASTER_B_VOL: u8 = 0x21;
 const CS43L22_REG_HP_A_VOL: u8 = 0x22;
 const CS43L22_REG_HP_B_VOL: u8 = 0x23;
-const CS43L22_REG_SPEAKER_A_VOL: u8 = 0x24;
-const CS43L22_REG_SPEAKER_B_VOL: u8 = 0x25;
+/*const CS43L22_REG_SPEAKER_A_VOL: u8 = 0x24;
+const CS43L22_REG_SPEAKER_B_VOL: u8 = 0x25;*/
 const CS43L22_REG_PCM_CH_SWAP: u8 = 0x26;
 const CS43L22_REG_LIMIT_CTL1: u8 = 0x27;
-const CS43L22_REG_LIMIT_CTL2: u8 = 0x28;
+/*const CS43L22_REG_LIMIT_CTL2: u8 = 0x28;
 const CS43L22_REG_LIMIT_ATTACK_RATE: u8 = 0x29;
 const CS43L22_REG_OVF_CLK_STATUS: u8 = 0x2E;
 const CS43L22_REG_BATT_COMP: u8 = 0x2F;
 const CS43L22_REG_VP_BATT_LEVEL: u8 = 0x30;
 const CS43L22_REG_SPEAKER_STATUS: u8 = 0x31;
-const CS43L22_REG_CHARGEPUMP_FREC: u8 = 0x32;
+const CS43L22_REG_CHARGEPUMP_FREC: u8 = 0x32;*/
 
 #[derive(Debug)]
 /// Errors that can occur when using the CS43L22 driver
@@ -666,58 +666,58 @@ impl From<BeepPitch> for u8 {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum BeepOnTime {
     /// 86ms
-    MS_86,
+    Ms86,
     /// 430ms
-    MS_430,
+    Ms430,
     /// 780ms
-    MS_780,
+    Ms780,
     /// 1200ms
-    MS_1200,
+    Ms1200,
     /// 1500ms
-    MS_1500,
+    Ms1500,
     /// 1800ms
-    MS_1800,
+    Ms1800,
     /// 2200ms
-    MS_2200,
+    Ms2200,
     /// 2500ms
-    MS_2500,
+    Ms2500,
     /// 2800ms
-    MS_2800,
+    Ms2800,
     /// 3200ms
-    MS_3200,
+    Ms3200,
     /// 3500ms
-    MS_3500,
+    Ms3500,
     /// 3800ms
-    MS_3800,
+    Ms3800,
     /// 4200ms
-    MS_4200,
+    Ms4200,
     /// 4500ms
-    MS_4500,
+    Ms4500,
     /// 4800ms
-    MS_4800,
+    Ms4800,
     /// 5200ms
-    MS_5200,
+    Ms5200,
 }
 
 impl BeepOnTime {
     fn value(self) -> u8 {
         match self {
-            Self::MS_86 => 0b0000,
-            Self::MS_430 => 0b0001,
-            Self::MS_780 => 0b0010,
-            Self::MS_1200 => 0b0011,
-            Self::MS_1500 => 0b0100,
-            Self::MS_1800 => 0b0101,
-            Self::MS_2200 => 0b0110,
-            Self::MS_2500 => 0b0111,
-            Self::MS_2800 => 0b1000,
-            Self::MS_3200 => 0b1001,
-            Self::MS_3500 => 0b1010,
-            Self::MS_3800 => 0b1011,
-            Self::MS_4200 => 0b1100,
-            Self::MS_4500 => 0b1101,
-            Self::MS_4800 => 0b1110,
-            Self::MS_5200 => 0b1111,
+            Self::Ms86 => 0b0000,
+            Self::Ms430 => 0b0001,
+            Self::Ms780 => 0b0010,
+            Self::Ms1200 => 0b0011,
+            Self::Ms1500 => 0b0100,
+            Self::Ms1800 => 0b0101,
+            Self::Ms2200 => 0b0110,
+            Self::Ms2500 => 0b0111,
+            Self::Ms2800 => 0b1000,
+            Self::Ms3200 => 0b1001,
+            Self::Ms3500 => 0b1010,
+            Self::Ms3800 => 0b1011,
+            Self::Ms4200 => 0b1100,
+            Self::Ms4500 => 0b1101,
+            Self::Ms4800 => 0b1110,
+            Self::Ms5200 => 0b1111,
         }
     }
 }
@@ -733,34 +733,34 @@ impl From<BeepOnTime> for u8 {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum BeepOffTime {
     /// 1230ms
-    MS_1230,
+    Ms1230,
     /// 2580ms
-    MS_2580,
+    Ms2580,
     /// 3900ms
-    MS_3900,
+    Ms3900,
     /// 5220ms
-    MS_5220,
+    Ms5220,
     /// 6600ms
-    MS_6600,
+    Ms6600,
     /// 8050ms
-    MS_8050,
+    Ms8050,
     /// 9350ms
-    MS_9350,
+    Ms9350,
     /// 10800ms
-    MS_10800,
+    Ms10800,
 }
 
 impl BeepOffTime {
     fn value(self) -> u8 {
         match self {
-            Self::MS_1230 => 0b000,
-            Self::MS_2580 => 0b001,
-            Self::MS_3900 => 0b010,
-            Self::MS_5220 => 0b011,
-            Self::MS_6600 => 0b100,
-            Self::MS_8050 => 0b101,
-            Self::MS_9350 => 0b110,
-            Self::MS_10800 => 0b111,
+            Self::Ms1230 => 0b000,
+            Self::Ms2580 => 0b001,
+            Self::Ms3900 => 0b010,
+            Self::Ms5220 => 0b011,
+            Self::Ms6600 => 0b100,
+            Self::Ms8050 => 0b101,
+            Self::Ms9350 => 0b110,
+            Self::Ms10800 => 0b111,
         }
     }
 }
@@ -820,8 +820,8 @@ impl BeepConfig {
     pub fn new() -> Self {
         Self {
             pitch: BeepPitch::C4,
-            on_time: BeepOnTime::MS_86,
-            off_time: BeepOffTime::MS_1230,
+            on_time: BeepOnTime::Ms86,
+            off_time: BeepOffTime::Ms1230,
             mode: BeepMode::Off,
             mix: false,
             volume: 70,
