@@ -20,7 +20,7 @@ Add the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-cs43l22-embedded = "0.1.0"
+cs43l22-embedded = "1.0.0-alpha"
 ```
 
 ## Usage
@@ -35,6 +35,8 @@ fn main() {
     // Initialize the driver (adjust parameters as needed)
     let mut cs43l22 = Cs43l22::new(
         &mut i2c_device,
+        reset_pin,
+        delay_handler,
         cs43l22_embedded::Config::default(),
         cs43l22_embedded::BeepConfig::default(),
         false,
@@ -54,7 +56,10 @@ Refer to the crate documentation for the available API methods.
 
 ## Development
 
-For embedded targets, configure your build environment accordingly. Check the [Embedded Book](https://docs.rust-embedded.org) for additional guidance.
+For embedded targets, configure your build environment accordingly. Check the [Embedded Book](https://docs.rust-embedded.org) for additional guidance. Or check the examples for the STM32F407G-DISC1 dev board.
+
+## Notes
+Not everything as been tested so alpha stage until I make sure everything works as expected.
 
 ## License
 
