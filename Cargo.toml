@@ -1,5 +1,8 @@
 [package]
 name = "cs43l22-embedded"
+description = "A cs43l22 DAC driver using embedded-hal"
+license = "GPL-3.0-or-later"
+keywords = ["cs43l22", "dac", "embedded"]
 version = "0.1.0"
 edition = "2021"
 
