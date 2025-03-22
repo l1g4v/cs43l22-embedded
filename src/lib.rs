@@ -6,7 +6,8 @@
 #![doc = document_features::document_features!(feature_label = r#"<span class="stab portability"><code>{feature}</code></span>"#)]
 
 pub(crate) mod fmt;
-use embedded_hal::i2c;
+use embedded_hal::{digital::OutputPin, i2c};
+use embedded_hal::delay::DelayNs;
 
 const CS43L22_ADDR: u8 = 74;
 
@@ -175,9 +176,13 @@ impl Default for Config {
 /// The I2C interface must implement the `embedded_hal::i2c::I2c` trait
 /// The I2C error type must implement the `core::fmt::Debug` trait
 
-pub struct Cs43l22<I2C> {
+pub struct Cs43l22<I2C, RST, DL> {
     /// I2C interface
     pub i2c: I2C,
+    /// Reset pin
+    pub reset: RST,
+    /// Mutable delay
+    pub delay: DL,
     /// CS43L22 configuration
     pub config: Config,
     /// Beep configuration
@@ -186,25 +191,34 @@ pub struct Cs43l22<I2C> {
 }
 /// Type alias for the result of a CS43L22 operation
 
-impl<I2C, I2CError> Cs43l22<I2C>
+impl<I2C, I2CError, RST, DL> Cs43l22<I2C, RST, DL>
 where
     I2C: i2c::I2c<u8, Error = I2CError>,
     I2CError: i2c::Error,
+    RST: OutputPin,
+    DL: DelayNs,
 {
     /// Create a new CS43L22 driver
     /// This function creates a new CS43L22 driver from an I2C interface and initializes the device
     pub fn new(
         i2c: I2C,
+        reset: RST,
+        delay: DL,
         config: Config,
         beep_config: BeepConfig,
         dsp_mode: bool,
     ) -> Result<Self, I2CError> {
         let mut cs43l22 = Self {
             i2c,
+            reset,
+            delay,
             config,
             beep_config,
             running: false,
         };
+
+        //Reset the CS43L22
+        cs43l22.reset()?;
 
         //read the chip id
         let mut chip_id = [0u8; 1];
@@ -283,6 +297,15 @@ where
 
             self.running = true;
         }
+        Ok(())
+    }
+
+    /// Resets the CS43L22 to its default state
+    pub fn reset(&mut self) -> Result<(), I2CError> {
+        self.reset.set_low().ok();
+        self.delay.delay_ms(100);
+        self.reset.set_high().ok();
+        self.delay.delay_ms(100);
         Ok(())
     }
 
@@ -528,7 +551,7 @@ where
 pub enum OutputDevice {
     /// Speaker
     Speaker,
-    /// Headphone
+    /// Headphones
     Headphone,
     /// Both
     Both,
@@ -559,7 +582,7 @@ impl From<OutputDevice> for u8 {
 pub enum InterfaceFormat {
     /// DSP Mode
     LeftJustified,
-    /// I2S
+    /// I2S Philips
     I2S,
     /// Right Justified
     RightJustified,
@@ -614,21 +637,37 @@ impl From<WordLength> for u8 {
 /// This is used to select the output device of the CS43L22
 /// on the register 0x04
 pub enum BeepPitch {
+    /// 260.87 Hz
     C4,
+    /// 521.74 Hz
     C5,
+    /// 585.37 Hz
     D5,
+    /// 666.67 Hz
     E5,
+    /// 705.88 Hz
     F5,
+    /// 774.19 Hz
     G5,
+    /// 888.89 Hz
     A5,
+    /// 1000 Hz
     B5,
+    /// 1043.48 Hz
     C6,
+    /// 1200.00 Hz
     D6,
+    /// 1333.33 Hz
     E6,
+    /// 1411.76 Hz
     F6,
+    /// 1600.00 Hz
     G6,
+    /// 1714.29 Hz
     A6,
+    /// 2000.00 Hz
     B6,
+    /// 2181.82 Hz
     C7,
 }
 
@@ -666,58 +705,58 @@ impl From<BeepPitch> for u8 {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum BeepOnTime {
     /// 86ms
-    Ms86,
+    _86ms,
     /// 430ms
-    Ms430,
+    _430ms,
     /// 780ms
-    Ms780,
+    _780ms,
     /// 1200ms
-    Ms1200,
+    _1200ms,
     /// 1500ms
-    Ms1500,
+    _1500ms,
     /// 1800ms
-    Ms1800,
+    _1800ms,
     /// 2200ms
-    Ms2200,
+    _2200ms,
     /// 2500ms
-    Ms2500,
+    _2500ms,
     /// 2800ms
-    Ms2800,
+    _2800ms,
     /// 3200ms
-    Ms3200,
+    _3200ms,
     /// 3500ms
-    Ms3500,
+    _3500ms,
     /// 3800ms
-    Ms3800,
+    _3800ms,
     /// 4200ms
-    Ms4200,
+    _4200ms,
     /// 4500ms
-    Ms4500,
+    _4500ms,
     /// 4800ms
-    Ms4800,
+    _4800ms,
     /// 5200ms
-    Ms5200,
+    _5200ms,
 }
 
 impl BeepOnTime {
     fn value(self) -> u8 {
         match self {
-            Self::Ms86 => 0b0000,
-            Self::Ms430 => 0b0001,
-            Self::Ms780 => 0b0010,
-            Self::Ms1200 => 0b0011,
-            Self::Ms1500 => 0b0100,
-            Self::Ms1800 => 0b0101,
-            Self::Ms2200 => 0b0110,
-            Self::Ms2500 => 0b0111,
-            Self::Ms2800 => 0b1000,
-            Self::Ms3200 => 0b1001,
-            Self::Ms3500 => 0b1010,
-            Self::Ms3800 => 0b1011,
-            Self::Ms4200 => 0b1100,
-            Self::Ms4500 => 0b1101,
-            Self::Ms4800 => 0b1110,
-            Self::Ms5200 => 0b1111,
+            Self::_86ms => 0b0000,
+            Self::_430ms => 0b0001,
+            Self::_780ms => 0b0010,
+            Self::_1200ms => 0b0011,
+            Self::_1500ms => 0b0100,
+            Self::_1800ms => 0b0101,
+            Self::_2200ms => 0b0110,
+            Self::_2500ms => 0b0111,
+            Self::_2800ms => 0b1000,
+            Self::_3200ms => 0b1001,
+            Self::_3500ms => 0b1010,
+            Self::_3800ms => 0b1011,
+            Self::_4200ms => 0b1100,
+            Self::_4500ms => 0b1101,
+            Self::_4800ms => 0b1110,
+            Self::_5200ms => 0b1111,
         }
     }
 }
@@ -733,34 +772,34 @@ impl From<BeepOnTime> for u8 {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum BeepOffTime {
     /// 1230ms
-    Ms1230,
+    _1230ms,
     /// 2580ms
-    Ms2580,
+    _2580ms,
     /// 3900ms
-    Ms3900,
+    _3900ms,
     /// 5220ms
-    Ms5220,
+    _5220ms,
     /// 6600ms
-    Ms6600,
+    _6600ms,
     /// 8050ms
-    Ms8050,
+    _8050ms,
     /// 9350ms
-    Ms9350,
+    _9350ms,
     /// 10800ms
-    Ms10800,
+    _10800ms,
 }
 
 impl BeepOffTime {
     fn value(self) -> u8 {
         match self {
-            Self::Ms1230 => 0b000,
-            Self::Ms2580 => 0b001,
-            Self::Ms3900 => 0b010,
-            Self::Ms5220 => 0b011,
-            Self::Ms6600 => 0b100,
-            Self::Ms8050 => 0b101,
-            Self::Ms9350 => 0b110,
-            Self::Ms10800 => 0b111,
+            Self::_1230ms => 0b000,
+            Self::_2580ms => 0b001,
+            Self::_3900ms => 0b010,
+            Self::_5220ms => 0b011,
+            Self::_6600ms => 0b100,
+            Self::_8050ms => 0b101,
+            Self::_9350ms => 0b110,
+            Self::_10800ms => 0b111,
         }
     }
 }
@@ -820,8 +859,8 @@ impl BeepConfig {
     pub fn new() -> Self {
         Self {
             pitch: BeepPitch::C4,
-            on_time: BeepOnTime::Ms86,
-            off_time: BeepOffTime::Ms1230,
+            on_time: BeepOnTime::_86ms,
+            off_time: BeepOffTime::_1230ms,
             mode: BeepMode::Off,
             mix: false,
             volume: 70,
@@ -940,21 +979,37 @@ impl From<BassCutoff> for u8 {
 #[derive(Debug, Clone, Copy, PartialEq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ToneGain {
+    /// 12dB
     _12dB,
+    /// 10.5dB
     _10_5dB,
+    /// 9dB
     _9dB,
+    /// 7.5dB
     _7_5dB,
+    /// 6dB
     _6dB,
+    /// 4.5dB
     _4_5dB,
+    /// 3dB
     _3dB,
+    /// 1.5dB
     _1_5dB,
+    /// 0dB
     _0dB,
+    /// -1.5dB
     Min1_5dB,
+    /// -3dB
     Min3dB,
+    /// -4.5dB
     Min4_5dB,
+    /// -6dB
     Min6dB,
+    /// -7.5dB
     Min7_5dB,
+    /// -9dB
     Min9dB,
+    /// -10.5dB
     Min10_5dB,
 }
 
