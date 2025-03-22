@@ -1,16 +1,18 @@
 # cs43l22-embedded
 
-A Rust crate for interfacing with the CS43L22 audio codec on embedded platforms.
+A Rust crate for interfacing with the CS43L22 DAC on embedded platforms.
 
 ## Overview
 
-The `cs43l22-embedded` crate provides a driver for the CS43L22 audio codec. Designed for embedded applications, it allows you to initialize, configure, and control audio playback.
+The `cs43l22-embedded` crate provides a driver for the CS43L22 DAC. Designed for embedded applications, it allows you to initialize, configure, and control the DAC.
 
 ## Features
 
 - Initialization and configuration routines for the CS43L22.
-- Control functions for audio playback.
-- Minimal dependencies, ideal for no_std environments.
+- Control functions for audio.
+- Control over data format
+- Pretty much everything from the datasheet
+- Minimal dependencies.
 
 ## Installation
 
@@ -52,7 +54,7 @@ Refer to the crate documentation for the available API methods.
 
 ## Development
 
-For embedded targets, configure your build environment accordingly. Check the [Rust Embedded Book](https://docs.rust-embedded.org) for additional guidance.
+For embedded targets, configure your build environment accordingly. Check the [Embedded Book](https://docs.rust-embedded.org) for additional guidance.
 
 ## License
 
