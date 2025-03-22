@@ -5,8 +5,9 @@ license = "GPL-3.0-or-later"
 keywords = ["cs43l22", "dac", "embedded"]
 categories = ["embedded"]
 repository = "https://github.com/l1g4v/cs43l22-embedded"
-version = "0.1.0"
+version = "1.0.0-alpha"
 edition = "2021"
+rust-version = "1.60"
 
 exclude = [
     "examples/stm32f4",
